@@ -2,6 +2,42 @@ import React from 'react';
 
 import FruitBasket from './FruitBasket';
 
-const App = () => <FruitBasket />;
 
-export default App;
+export default class App extends React.Component {
+  constructor () {
+    super ()
+    this.state = {
+      fruit: [],
+      filters: [],
+      currentFilter: null,
+      items: []
+    }
+  }
+
+  componentWillMount() {
+    this.fetchFilters();
+  }
+
+  componentDidMount() {
+    fetch('/api/fruit')
+      .then(response => response.json())
+      .then(items => this.setState({ items }));
+  }
+
+  fetchFilters = () => {
+    fetch('/api/fruit_types')
+      .then(response => response.json())
+      .then(filters => this.setState({ filters }));
+  }
+
+  handleFilterChange = event => {
+    console.log('new filter: ', event.target.value);
+    this.setState({ currentFilter: event.target.value });
+  }
+
+  render () {
+    return (
+      <div><FruitBasket handleFilterChange={this.handleFilterChange} currentFilter={this.state.currentFilter} filters={this.state.filters} items={this.state.items}/></div>
+    )
+  }
+}
